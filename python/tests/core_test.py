@@ -1,3 +1,4 @@
+import datetime
 import unittest
 
 import pandas as pd
@@ -51,3 +52,7 @@ class CoreTestCase(unittest.TestCase):
         self.core.store2cvs_file(time_series)
         self.core.avg_weekly_price()
         self.assertIsInstance(get_df(self.core.FILE_NAME_AVG), pd.DataFrame)
+
+    def test_max_relative_span(self):
+        week_max_rel_span = self.core.max_relative_span()
+        self.assertEquals(week_max_rel_span, datetime.date(2017, 12, 10))

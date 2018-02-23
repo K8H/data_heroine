@@ -58,15 +58,46 @@ def get_t_series_df():
     return df
 
 
+def store_pd2csv(df, file_name):
+    """
+    Stores pandas data frame into csv file.
+
+    :param df: data frame to be stored into csv file
+    :param file_name: name of the csv file
+    """
+    df.to_csv(file_name)
+
+
 def avg_weekly_price():
     """
-    Groups timestamps by week and computes mean price on each group. The data frame is stored to a csv file. 
+    Groups timestamps by week and computes mean price on each group. 
+    
+    :return: GroupBy object of average weekly values
     """
     df = get_t_series_df()
-    mean_weekly_df = df.groupby(pd.TimeGrouper(freq='W')).mean()
-    mean_weekly_df.to_csv(FILE_NAME_AVG)
+    return df.groupby(pd.TimeGrouper(freq='W')).mean()
+
+
+def max_relative_span():
+    """
+    Compute what is the week that had the greatest relative span on closing prices (difference between the maximum and 
+    minimum closing price, divided by the minimum closing price), and print this on screen.
+    
+    Mathematically: relative_span = (max(price) min(price)) / min(price)
+    
+    :return: date of a week with the maximum relative span on closing prices
+    """
+    open_df = get_t_series_df()['open (USD)']
+    min_max_df = pd.DataFrame()
+    min_max_df['min'] = open_df.groupby(pd.TimeGrouper(freq='W')).min()
+    min_max_df['max'] = open_df.groupby(pd.TimeGrouper(freq='W')).max()
+    min_max_df['rel_span'] = ((min_max_df['max'] - min_max_df['min']) / min_max_df['min'])
+    max_rel_span = min_max_df['rel_span'].max()
+    return min_max_df[min_max_df['rel_span'] == max_rel_span].index.date[0]
 
 if __name__ == '__main__':
     t_series = download_crypto_curr()
     store2cvs_file(time_series=t_series)
-    avg_weekly_price()
+    avg_weekly_df = avg_weekly_price()
+    store_pd2csv(avg_weekly_df, FILE_NAME_AVG)
+    rel_span = max_relative_span()
