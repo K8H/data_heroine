@@ -96,8 +96,16 @@ def max_relative_span():
     return min_max_df[min_max_df['rel_span'] == max_rel_span].index.date[0]
 
 if __name__ == '__main__':
-    t_series = download_crypto_curr()
-    store2cvs_file(time_series=t_series)
-    avg_weekly_df = avg_weekly_price()
-    store_pd2csv(avg_weekly_df, FILE_NAME_AVG)
-    rel_span = max_relative_span()
+    if len(sys.argv) == 3:
+        t_series = download_crypto_curr(url=sys.argv[2])
+        store2cvs_file(time_series=t_series)
+    else:
+        t_series = download_crypto_curr()
+        store2cvs_file(time_series=t_series)
+
+    if sys.argv[1] == 'avg':
+        avg_weekly_df = avg_weekly_price()
+        store_pd2csv(avg_weekly_df, FILE_NAME_AVG)
+    elif sys.argv[1] == 'span':
+        rel_span = max_relative_span()
+        print(rel_span)
