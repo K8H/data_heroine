@@ -10,7 +10,7 @@ Two main features have been developed:
 
 Requirements
 ------------
-The software requires python version 3 and libraries ```pandas``` and ```requests```.
+The software requires python version 3 and libraries ``pandas`` and ``requests``.
 
 Running the Software
 --------------------
