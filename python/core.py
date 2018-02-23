@@ -1,4 +1,8 @@
 import sys
+import pandas as pd
+
+FILE_NAME_T = 'time_series.csv'
+FILE_NAME_AVG = 'avg_weekly_price.csv'
 
 
 def download_crypto_curr(url='https://www.alphavantage.co/query?' 
@@ -33,16 +37,36 @@ def store2cvs_file(time_series):
     """
     import csv
 
-    with open('time_series.csv', 'w') as f:
-        writer = csv.writer(f)
-        reader = csv.reader(time_series.text.splitlines())
+    if time_series:
+        with open(FILE_NAME_T, 'w') as f:
+            writer = csv.writer(f)
+            reader = csv.reader(time_series.text.splitlines())
 
-        for row in reader:
-            writer.writerow(row)
-        return f
+            for row in reader:
+                writer.writerow(row)
+    return Exception('Time series should not be None.')
 
+
+def get_t_series_df():
+    """
+    Returns pandas data frame of csv file
+    
+    :return: time series pandas.DataFrame
+    """
+    df = pd.read_csv(FILE_NAME_T).set_index('timestamp')
+    df.index = pd.to_datetime(df.index)
+    return df
+
+
+def avg_weekly_price():
+    """
+    Groups timestamps by week and computes mean price on each group. The data frame is stored to a csv file. 
+    """
+    df = get_t_series_df()
+    mean_weekly_df = df.groupby(pd.TimeGrouper(freq='W')).mean()
+    mean_weekly_df.to_csv(FILE_NAME_AVG)
 
 if __name__ == '__main__':
     t_series = download_crypto_curr()
     store2cvs_file(time_series=t_series)
-    print('blablablabl')
+    avg_weekly_price()
