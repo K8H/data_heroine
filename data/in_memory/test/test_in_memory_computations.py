@@ -8,7 +8,8 @@ import pandas as pd
 import requests
 
 sys.path.append("..")
-from python import core  # noqa
+from data import core   # noqa
+from data.in_memory import in_memory_computations  # noqa
 
 
 def get_df(file_name):
@@ -35,6 +36,7 @@ def captured_output():
 class CoreTestCase(unittest.TestCase):
     def setUp(self):
         self.core = core
+        self.python = in_memory_computations
 
     def test_print_datetime_output(self):
         with captured_output() as (out, err):
@@ -60,19 +62,17 @@ class CoreTestCase(unittest.TestCase):
         self.assertEqual(cm.exception.code, 1)
 
     def test_store_to_csv_creates_csv(self):
-        time_series = self.core.download_crypto_curr_to_csv()
-        self.core.store_to_csv(time_series)
+        self.core.download_crypto_curr_to_csv()
         self.assertIsInstance(get_df(self.core.FILE_NAME_T), pd.DataFrame)
 
     def test_store_to_csv_file_without_t_series(self):
         self.assertRaises(Exception, self.core.store_to_csv(''), 'Time series should not be None.')
 
     def test_compute_avg_weekly_price_df_returns_df(self):
-        time_series = self.core.download_crypto_curr_to_csv()
-        self.core.store_to_csv(time_series)
-        self.core.compute_avg_weekly_price_to_csv()
+        self.core.download_crypto_curr_to_csv()
+        self.python.compute_avg_weekly_price_to_csv()
         self.assertIsInstance(get_df(self.core.FILE_NAME_AVG), pd.DataFrame)
 
     def test_get_week_of_max_relative_span_in_memory_file(self):
-        week_max_rel_span = self.core.get_week_of_max_relative_span(test=True)
+        week_max_rel_span = self.python.get_week_of_max_relative_span(test=True)
         self.assertEqual(week_max_rel_span, datetime.date(2018, 2, 5))
