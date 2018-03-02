@@ -10,16 +10,21 @@ Two main features have been developed:
 
 Requirements
 ------------
-The software requires python version 3 and libraries ``pandas`` and ``requests``.
+The software requires python version 3 and libraries ``pandas``, ``requests`` and ``configparser``.
 
 Running the Software
 --------------------
 
-First feature can be run in cmd with ``$ python3 core.py avg`` and the second with command ``$ python3 core.py span``
+First feature can be run in cmd with ``$ python3 in_memory/in_memory_computations.py --feature avg`` and the second with
+command ``$ python3 in_memory/in_memory_computations.py --feature span``
 
 By default it calculates data for "Daily Digital & Crypto Currencies", for currency ‘BTC’ and USD market, although it
 may be altered by passing URL, which specifies different parameters (for additional info check see
 [documentation](https://www.alphavantage.co/documentation/) ). In such case run the software with:
-``$ python3 core.py avg 'url with custom parameters'``
+``$ python3 core.py --feature avg --url url_with_custom_parameters``
+
+Running the Tests
+-----------------
+The tests can be run in cmd with ``$ python3 -m unittest discover -b`` where -b denotes nicer cmd output.
 
 
