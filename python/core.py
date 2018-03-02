@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import argparse
 import csv
 import sys
 from datetime import datetime
@@ -18,11 +19,11 @@ def print_datetime_output(output=''):
 
 
 def download_crypto_curr_to_csv(url=('https://www.alphavantage.co/query?'
-                              'function=DIGITAL_CURRENCY_DAILY&'
-                              'symbol=BTC&'
-                              'market=USD&'
-                              'apikey=1LUM05IW26CBPVKM&'
-                              'datatype=csv')):
+                                     'function=DIGITAL_CURRENCY_DAILY&'
+                                     'symbol=BTC&'
+                                     'market=USD&'
+                                     'apikey=1LUM05IW26CBPVKM&'
+                                     'datatype=csv')):
     """
     Downloads the historical time series from the API anf store them into csv file.
 
@@ -32,6 +33,7 @@ def download_crypto_curr_to_csv(url=('https://www.alphavantage.co/query?'
     :return: a response of API
     """
     try:
+        print_datetime_output('Make request to url \'%s\'' % url)
         response = requests.get(url)
         store_to_csv(response)
     except requests.exceptions.RequestException as e:
@@ -46,6 +48,7 @@ def store_to_csv(time_series):
     :param time_series: API's response in bytes
     """
     if time_series:
+        print_datetime_output('Store response to file \'%s\'' % FILE_NAME_T)
         with open(FILE_NAME_T, 'w') as f:
             writer = csv.writer(f)
             reader = csv.reader(time_series.text.splitlines())
@@ -111,12 +114,19 @@ def get_week_of_max_relative_span(test=False):
 
 if __name__ == '__main__':
 
-    if len(sys.argv) == 3:
-        download_crypto_curr_to_csv(url=sys.argv[2])
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--feature', action='store', help="choose a feature", default="avg")
+    parser.add_argument('--url', action='store', help="optional url from which to download values", default=None)
+    args = parser.parse_args()
+
+    if args.url is not None:
+        download_crypto_curr_to_csv(url=args.url)
     else:
         download_crypto_curr_to_csv()
 
-    if sys.argv[1] == 'avg':
+    if args.feature == 'avg':
         compute_avg_weekly_price_to_csv()
-    elif sys.argv[1] == 'span':
+    elif args.feature == 'span':
         get_week_of_max_relative_span()
+    else:
+        print_datetime_output('You must run the software with parameter \'--feature span\' or \'--feature avg\'')
