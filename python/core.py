@@ -3,12 +3,25 @@ import argparse
 import csv
 import sys
 from datetime import datetime
+from configparser import ConfigParser
 
 import pandas as pd
 import requests
 
 FILE_NAME_T = 'time_series.csv'
 FILE_NAME_AVG = 'avg_weekly_price.csv'
+
+
+def get_conf_api_key():
+    """
+    Config parser reads 'config.ini' file and returns api key value.
+
+    :return: api key string value
+    """
+    print_datetime_output('Reads api key value from \'config.ini\' file.')
+    config_parser = ConfigParser()
+    config_parser.read('config.ini')
+    return config_parser.get('download_crypto', 'api_key')
 
 
 def print_datetime_output(output=''):
@@ -22,8 +35,8 @@ def download_crypto_curr_to_csv(url=('https://www.alphavantage.co/query?'
                                      'function=DIGITAL_CURRENCY_DAILY&'
                                      'symbol=BTC&'
                                      'market=USD&'
-                                     'apikey=1LUM05IW26CBPVKM&'
-                                     'datatype=csv')):
+                                     'apikey=%s'
+                                     'datatype=csv' % get_conf_api_key())):
     """
     Downloads the historical time series from the API anf store them into csv file.
 
