@@ -1,0 +1,10 @@
+[download_crypto]
+api_key: your_api_key
+
+[file_name]
+time_series: time_series.csv
+average: avg_weekly_price.csv
+
+[database]
+file_name: crypto_curr.sqlite
+table_name: daily_usd_btc
