@@ -9,7 +9,7 @@ class Sqlite(ComputationProvider):
 
     def __init__(self, test=False):
         """
-
+        The class provides calculations on data, that are stored in sqlite database, executing queries.
         """
         super().__init__()
         self.db_name = self.config_parser.get('database', 'file_name')

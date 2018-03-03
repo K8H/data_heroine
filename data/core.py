@@ -6,9 +6,10 @@ from in_memory import in_memory_computations
 
 def get_computation_mode_object(mode):
     """
+    Provides instance of an object, based on desired mode: Sqlite or InMemory
 
-    :param mode: computation mode (sqlite or in_memory)
-    :return:
+    :param mode: computation mode ('sqlite' or 'in_memory')
+    :return: instance of an object (Sqlite or InMemory)
     """
     if mode == 'sqlite':
         return sqlite_computations.Sqlite()

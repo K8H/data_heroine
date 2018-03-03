@@ -7,7 +7,7 @@ class InMemory(ComputationProvider):
 
     def __init__(self):
         """
-        
+        The class provides calculations on data, that are stored in dataframe, aka in-memory.
         """
         super().__init__()
         self.download_crypto_curr_to_csv()
@@ -19,7 +19,7 @@ class InMemory(ComputationProvider):
         """
         df = self.get_t_series_df(file_name=self.time_series_file_name)
         self.print_datetime_output('Group time series by week and compute mean price')
-        df = df.groupby(pd.Grouper(freq='W-MON')).mean()
+        df = df.groupby(pd.Grouper(freq='W-SUN')).mean()
         self.print_datetime_output('Store data frame to file \'%s\'' % self.avg_price_file_name)
         df.to_csv(self.avg_price_file_name)
 
@@ -42,8 +42,8 @@ class InMemory(ComputationProvider):
         self.print_datetime_output(
             'Group time series by week on close price, computes min & max and calculates max relative span')
         min_max_close_price_df = pd.DataFrame()
-        min_max_close_price_df['min'] = close_df.groupby(pd.Grouper(freq='W-MON')).min()
-        min_max_close_price_df['max'] = close_df.groupby(pd.Grouper(freq='W-MON')).max()
+        min_max_close_price_df['min'] = close_df.groupby(pd.Grouper(freq='W-SUN')).min()
+        min_max_close_price_df['max'] = close_df.groupby(pd.Grouper(freq='W-SUN')).max()
         min_max_close_price_df['rel_span'] = ((min_max_close_price_df['max'] - min_max_close_price_df['min'])
                                               / min_max_close_price_df['min'])
         max_rel_span = min_max_close_price_df['rel_span'].max()
@@ -62,23 +62,3 @@ class InMemory(ComputationProvider):
         df = pd.read_csv(file_name).set_index('timestamp')
         df.index = pd.to_datetime(df.index)
         return df
-
-
-# if __name__ == '__main__':
-#
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('--feature', action='store', help="choose a feature", default="avg")
-#     parser.add_argument('--url', action='store', help="optional url from which to download values", default=None)
-#     args = parser.parse_args()
-#
-#     if args.url is not None:
-#         base.download_crypto_curr_to_csv(url=args.url)
-#     else:
-#         base.download_crypto_curr_to_csv()
-#
-#     if args.feature == 'avg':
-#         compute_avg_weekly_price_to_csv()
-#     elif args.feature == 'span':
-#         get_week_of_max_relative_span()
-#     else:
-#         base.print_datetime_output('You must run the software with parameter \'--feature span\' or \'--feature avg\'')

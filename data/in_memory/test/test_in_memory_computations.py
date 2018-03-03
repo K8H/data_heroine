@@ -20,4 +20,4 @@ class InMemoryComputationsTestCase(unittest.TestCase):
 
     def test_get_week_of_max_relative_span_in_memory_file(self):
         week_max_rel_span = self.in_memory.get_week_of_max_relative_span(test=True)
-        self.assertEqual(week_max_rel_span, datetime.date(2018, 2, 5))
+        self.assertEqual(week_max_rel_span, datetime.date(2015, 1, 18))
