@@ -1,69 +1,34 @@
-import csv
-import datetime
-import sys
-import requests
+import argparse
 
-from configparser import ConfigParser
+from sqlite import sqlite_computations
+from in_memory import in_memory_computations
 
 
-FILE_NAME_T = 'time_series.csv'
-FILE_NAME_AVG = 'avg_weekly_price.csv'
-
-
-def get_conf_api_key():
+def get_computation_mode_object(mode):
     """
-    Config parser reads 'config.ini' file and returns api key value.
 
-    :return: api key string value
+    :param mode: computation mode (sqlite or in_memory)
+    :return:
     """
-    print_datetime_output('Reads api key value from \'config.ini\' file.')
-    config_parser = ConfigParser()
-    config_parser.read('config.ini')
-    return config_parser.get('download_crypto', 'api_key')
+    if mode == 'sqlite':
+        return sqlite_computations.Sqlite()
+    elif mode == 'in_memory':
+        return in_memory_computations.InMemory()
+    else:
+        print('You must run the software with parameter \'--feature span\' or \'--feature avg\'')
 
 
-def print_datetime_output(output=''):
-    """
-    Prints the cmd output with formatted date and time.
-    """
-    print('{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()), output)
+if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', action='store', help="choose a computation mode", default="sqlite")
+    parser.add_argument('--feature', action='store', help="choose a feature", default="avg")
+    parser.add_argument('--url', action='store', help="optional url from which to download values", default=None)
+    args = parser.parse_args()
 
-def download_crypto_curr_to_csv(url=('https://www.alphavantage.co/query?'
-                                     'function=DIGITAL_CURRENCY_DAILY&'
-                                     'symbol=BTC&'
-                                     'market=USD&'
-                                     'apikey=%s'
-                                     'datatype=csv' % get_conf_api_key())):
-    """
-    Downloads the historical time series from the API anf store them into csv file.
-
-    Makes GET request to API's endpoint for the "Daily Digital & Crypto Currencies", specifying as symbol ‘BTC’ and as 
-    market ‘USD’.
-
-    :return: a response of API
-    """
-    try:
-        print_datetime_output('Make request to url \'%s\'' % url)
-        response = requests.get(url)
-        store_to_csv(response)
-    except requests.exceptions.RequestException as e:
-        print(e)
-        sys.exit(1)
-
-
-def store_to_csv(time_series):
-    """
-    Takes API's response in bytes and store row after row into csv file, named 'time_series.csv'
-
-    :param time_series: API's response in bytes
-    """
-    if time_series:
-        print_datetime_output('Store response to file \'%s\'' % FILE_NAME_T)
-        with open(FILE_NAME_T, 'w') as f:
-            writer = csv.writer(f)
-            reader = csv.reader(time_series.text.splitlines())
-
-            for row in reader:
-                writer.writerow(row)
-    return Exception('Time series should not be None.')
+    if args.feature == 'avg':
+        get_computation_mode_object(args.mode).compute_avg_weekly_price_to_csv()
+    elif args.feature == 'span':
+        get_computation_mode_object(args.mode).get_week_of_max_relative_span()
+    else:
+        print('You must run the software with parameter \'--feature span\' or \'--feature avg\'')
